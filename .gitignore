@@ -7,3 +7,7 @@
 /build
 /captures
 .externalNativeBuild
+app/src/main/res/assests/
+app/src/main/res/drawable/
+src/main/res/assests/
+src/main/res/drawable/
