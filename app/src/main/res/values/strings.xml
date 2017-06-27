@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ftpd</string>
+    <string name="close">关闭</string>
+    <string name="open">打开</string>
+    <string name="service_closed">服务已关闭</string>
+    <string name="service_never_open">服务未开启</string>
+    <string name="tips">请通过浏览器或我的电脑访问以下地址:</string>
+    <string name="prefix_ftp">ftp://</string>
+    <string name="service_opening">正在开启服务</string>
+    <string name="shortcut_title">ftpserver</string>
+</resources>
