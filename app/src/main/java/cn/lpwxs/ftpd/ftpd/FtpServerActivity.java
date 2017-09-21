@@ -1,9 +1,12 @@
 package cn.lpwxs.ftpd.ftpd;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -11,7 +14,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,25 +48,43 @@ import static android.content.res.AssetManager.*;
 import static android.text.format.Formatter.formatIpAddress;
 
 /**
- *
  * 1、小文件没问题，大文件会出现主线程操作过多异常. 已解决
  * 解决方法：开启线程
- *
  */
 public class FtpServerActivity extends AppCompatActivity {
 
     public static final String ACTION_ADD_SHORTCUT = "com.android.launcher.action.INSTALL_SHORTCUT";
     public static final String ACTION_REMOVE_SHORTCUT = "com.android.launcher.action.UNINSTALL_SHORTCUT";
 
-    static{
-        System.setProperty("java.net.preferIPv6Addresses","false");
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+        // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
     }
+
+    static {
+        System.setProperty("java.net.preferIPv6Addresses", "false");
+    }
+
     private Context mContext;
-    private TextView tv ;
+    private TextView tv;
     private FtpServiceConn conn;
     private Intent intent;
     private IMyBinder myBinder;
-    private boolean isBinded ;
+    private boolean isBinded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,27 +92,28 @@ public class FtpServerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ftp_server);
         tv = (TextView) findViewById(R.id.tips);
         mContext = this;
-        Intent lauchIntent = new Intent(getApplicationContext(),FtpServerActivity.class);
+        Intent lauchIntent = new Intent(getApplicationContext(), FtpServerActivity.class);
         lauchIntent.setAction(Intent.ACTION_MAIN);
         lauchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        addShortcut(getApplicationContext(),lauchIntent,getString(R.string.shortcut_title),false,R.mipmap.ic_launcher_round);
+        addShortcut(getApplicationContext(), lauchIntent, getString(R.string.shortcut_title), false, R.mipmap.ic_launcher_round);
+        verifyStoragePermissions(this);
     }
 
 
     public String getLocalIpAddress() {
-        String strIP=null;
+        String strIP = null;
 //        try {
 
-            //获取wifi服务
-            WifiManager wifiManager = (WifiManager)mContext.getSystemService(Context.WIFI_SERVICE);
-            //判断wifi是否开启
-            if (!wifiManager.isWifiEnabled()) {
-                wifiManager.setWifiEnabled(true);
-            }
-            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-            int ipAddress = wifiInfo.getIpAddress();
-            String ip = formatIpAddress(ipAddress);
-            return ip;
+        //获取wifi服务
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        //判断wifi是否开启
+        if (!wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(true);
+        }
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ipAddress = wifiInfo.getIpAddress();
+        String ip = formatIpAddress(ipAddress);
+        return ip;
 
 
 //            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
@@ -108,7 +132,6 @@ public class FtpServerActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -116,29 +139,29 @@ public class FtpServerActivity extends AppCompatActivity {
 
     public void ToggleServer(View view) {
         Button button = (Button) view;
-        if(!isBinded) {
-            if(conn == null){
+        if (!isBinded) {
+            if (conn == null) {
                 conn = new FtpServiceConn();
             }
             //开启服务
             intent = new Intent(this, FtpService.class);
             Toast.makeText(mContext, R.string.service_opening, Toast.LENGTH_SHORT).show();
             isBinded = bindService(intent, conn, BIND_AUTO_CREATE);
-            Log.i("isBinded",isBinded+"");
+            Log.i("isBinded", isBinded + "");
 
-            if(isBinded) {
+            if (isBinded) {
                 String ip = getLocalIpAddress();
-                String tips = getString(R.string.tips)+"\n" +getString(R.string.prefix_ftp)+ ip + ":" + Utils.port + "\n";
+                String tips = getString(R.string.tips) + "\n" + getString(R.string.prefix_ftp) + ip + ":" + Utils.port + "\n";
                 tv.setText(tips);
                 button.setText(R.string.close);
-            }else{
+            } else {
                 tv.setText(R.string.service_never_open);
             }
-        }else{
-            if(conn == null){
+        } else {
+            if (conn == null) {
                 tv.setText(R.string.service_never_open);
-            }else {
-                if(myBinder != null){
+            } else {
+                if (myBinder != null) {
                     myBinder.stopFtpServer();
                 }
                 unbindService(conn);
@@ -153,10 +176,10 @@ public class FtpServerActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        if(myBinder != null){
+        if (myBinder != null) {
             myBinder.stopFtpServer();
         }
-        if(conn != null) {
+        if (conn != null) {
             unbindService(conn);
         }
         myBinder = null;
@@ -165,7 +188,7 @@ public class FtpServerActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private class FtpServiceConn implements ServiceConnection{
+    private class FtpServiceConn implements ServiceConnection {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -180,17 +203,17 @@ public class FtpServerActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * 添加快捷方式
-     *  @param context      context
+     *
+     * @param context      context
      * @param actionIntent 要启动的Intent
      * @param name         name
      * @param iconBitmap
      */
     public static void addShortcut(Context context, Intent actionIntent, String name,
                                    boolean allowRepeat, int iconBitmap) {
-        Bitmap bitmap  = BitmapFactory.decodeResource(Resources.getSystem(),iconBitmap);
+        Bitmap bitmap = BitmapFactory.decodeResource(Resources.getSystem(), iconBitmap);
         Intent addShortcutIntent = new Intent(ACTION_ADD_SHORTCUT);
         // 是否允许重复创建
         addShortcutIntent.putExtra("duplicate", allowRepeat);

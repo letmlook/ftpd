@@ -2,7 +2,7 @@ package cn.lpwxs.ftpd.ftpd.services;
 
 import android.content.Context;
 import android.os.Environment;
-import android.os.Handler;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import org.apache.ftpserver.FtpServer;
@@ -12,6 +12,7 @@ import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -19,9 +20,7 @@ import java.io.InputStream;
  */
 
 public class FtpThread extends Thread {
-    private static String ROOTDIR = Environment.getExternalStorageDirectory().getPath()+"/ftpd/";
-    private static String PROFILE = ROOTDIR+"user.properties";
-
+    private static String PROFILE = Environment.getExternalStorageDirectory().getPath()+File.separator+"ftpd"+File.separator+"user.properties";
     private Context mContext;
     private FtpServer mFtpServer;
 
@@ -40,12 +39,12 @@ public class FtpThread extends Thread {
         }
     }
 
-    public void stopFtpServer(){
-        if(mFtpServer != null){
+    public void stopFtpServer() {
+        if (mFtpServer != null) {
             mFtpServer.stop();
-            Log.i("ftpThread","stop done ...");
-        }else{
-            Log.i("ftpThread","stoped ...");
+            Log.i("ftpThread", "stop done ...");
+        } else {
+            Log.i("ftpThread", "stoped ...");
         }
     }
 
@@ -55,16 +54,9 @@ public class FtpThread extends Thread {
         ListenerFactory factory = new ListenerFactory();
 
         PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-        File dir = new File(ROOTDIR);
-        String profile = PROFILE;
-        File pfile = new File(profile);
-        if (!dir.exists()) {
-            dir.mkdir();
-            copyFilesFassets(context, pfile.getName(), profile);
-        } else if (!pfile.exists()) {
-            copyFilesFassets(context, pfile.getName(), profile);
-        }
-        userManagerFactory.setFile(pfile);
+        File profile = new File(PROFILE);
+        copyFilesFassets(context,profile.getName(),PROFILE);
+        userManagerFactory.setFile(profile);
         serverFactory.setUserManager(userManagerFactory.createUserManager());
 
         factory.setPort(Utils.port);
@@ -89,26 +81,12 @@ public class FtpThread extends Thread {
      */
     public void copyFilesFassets(Context context, String oldPath, String newPath) {
         try {
-            String fileNames[] = context.getAssets().list(oldPath);//获取assets目录下的所有文件及目录名
-            if (fileNames != null) {
-                Log.i("fileNames.length=", fileNames.length + "");
-            }
-            if (fileNames.length > 0) {//如果是目录
-                File file = new File(newPath);
-                file.mkdirs();//如果文件夹不存在，则递归
-                for (String fileName : fileNames) {
-                    copyFilesFassets(context, oldPath + "/" + fileName, newPath + "/" + fileName);
-                }
-            } else {//如果是文件
-                File file = new File(newPath);
-                if (!file.exists()) {
-                    file.createNewFile();
-                    file.setReadable(true);
-                    file.setWritable(true);
-                }
+            File desfile = new File(newPath);
+            if (!desfile.exists()) {
+                desfile.createNewFile();
                 Log.i("copy user.properties:", "oldpath=" + oldPath + ",newPath=" + newPath);
                 InputStream is = context.getAssets().open(oldPath);
-                FileOutputStream fos = new FileOutputStream(new File(newPath));
+                FileOutputStream fos = new FileOutputStream(desfile);
                 byte[] buffer = new byte[1024];
                 int byteCount = 0;
                 while ((byteCount = is.read(buffer)) != -1) {//循环从输入流读取 buffer字节
@@ -117,7 +95,8 @@ public class FtpThread extends Thread {
                 fos.flush();//刷新缓冲区
                 is.close();
                 fos.close();
-
+            }else {
+                Log.i("profile is exists.",newPath);
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block

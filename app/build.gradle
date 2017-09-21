@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "26.0.0"
+    buildToolsVersion '26.0.1'
     defaultConfig {
         applicationId "cn.lpwxs.ftpd.ftpd"
         minSdkVersion 15
@@ -18,16 +18,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/DEPENDENCIES'
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-//    compile fileTree(include: ['*.jar'], dir: 'libs')
+    //    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -36,6 +37,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'org.apache.ftpserver:ftpserver-core:1.1.1'
     compile 'org.slf4j:slf4j-android:1.7.25'
-//    compile 'org.slf4j:slf4j-log4j12:1.7.21'
+    //    compile 'org.slf4j:slf4j-log4j12:1.7.21'
     compile 'log4j:log4j:1.2.17'
 }
