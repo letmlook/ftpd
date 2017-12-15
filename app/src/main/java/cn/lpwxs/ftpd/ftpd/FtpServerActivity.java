@@ -12,6 +12,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
@@ -101,43 +103,32 @@ public class FtpServerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ftp_server);
         tv = (TextView) findViewById(R.id.tips);
         mContext = this;
-        Intent lauchIntent = new Intent(getApplicationContext(), FtpServerActivity.class);
-        lauchIntent.setAction(Intent.ACTION_MAIN);
-        lauchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        addShortcut(getApplicationContext(), lauchIntent, getString(R.string.shortcut_title), false, R.mipmap.ic_launcher_round);
+//        Intent lauchIntent = new Intent(getApplicationContext(), FtpServerActivity.class);
+//        lauchIntent.setAction(Intent.ACTION_MAIN);
+//        lauchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+//        addShortcut(getApplicationContext(), lauchIntent, getString(R.string.shortcut_title), false, R.mipmap.ic_launcher_round);
         verifyStoragePermissions(this);
     }
 
 
     public String getLocalIpAddress() {
-        String strIP = null;
-//        try {
-
-        //获取wifi服务
-        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        //判断wifi是否开启
-        if (!wifiManager.isWifiEnabled()) {
-            wifiManager.setWifiEnabled(true);
+        String ip = null;
+        ConnectivityManager connectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isAvailable()){
+            if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI){
+                //获取wifi服务
+                WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+                //判断wifi是否开启
+                if (!wifiManager.isWifiEnabled()) {
+                    wifiManager.setWifiEnabled(true);
+                }
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                int ipAddress = wifiInfo.getIpAddress();
+                ip = formatIpAddress(ipAddress);
+            }
         }
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        int ipAddress = wifiInfo.getIpAddress();
-        String ip = formatIpAddress(ipAddress);
         return ip;
-
-
-//            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-//                NetworkInterface intf = en.nextElement();
-//                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-//                    InetAddress inetAddress = enumIpAddr.nextElement();
-//                    if (!inetAddress.isLoopbackAddress() && inetAddress.is) {
-//                        strIP= inetAddress.getHostAddress();
-//                    }
-//                }
-//            }
-//        } catch (SocketException ex) {
-//            Log.e("msg", ex.toString());
-//        }
-//        return strIP;
     }
 
 
@@ -152,19 +143,24 @@ public class FtpServerActivity extends AppCompatActivity {
             if (conn == null) {
                 conn = new FtpServiceConn();
             }
-            //开启服务
-            intent = new Intent(this, FtpService.class);
-            Toast.makeText(mContext, R.string.service_opening, Toast.LENGTH_SHORT).show();
-            isBinded = bindService(intent, conn, BIND_AUTO_CREATE);
-            Log.i("isBinded", isBinded + "");
+            String ip = getLocalIpAddress();
+            if(ip == null){
+                tv.setText("请连接WIFI重新打开");
+            }else {
+                //开启服务
+                intent = new Intent(this, FtpService.class);
+                Toast.makeText(mContext, R.string.service_opening, Toast.LENGTH_SHORT).show();
+                isBinded = bindService(intent, conn, BIND_AUTO_CREATE);
+                Log.i("isBinded", isBinded + "");
 
-            if (isBinded) {
-                String ip = getLocalIpAddress();
-                String tips = getString(R.string.tips) + "\n" + getString(R.string.prefix_ftp) + ip + ":" + Utils.port + "\n";
-                tv.setText(tips);
-                button.setText(R.string.close);
-            } else {
-                tv.setText(R.string.service_never_open);
+                if (isBinded) {
+
+                    String tips = getString(R.string.tips) + "\n" + getString(R.string.prefix_ftp) + ip + ":" + Utils.port + "\n";
+                    tv.setText(tips);
+                    button.setText(R.string.close);
+                } else {
+                    tv.setText(R.string.service_never_open);
+                }
             }
         } else {
             if (conn == null) {

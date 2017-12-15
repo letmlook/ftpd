@@ -83,6 +83,10 @@ public class FtpThread extends Thread {
         try {
             File desfile = new File(newPath);
             if (!desfile.exists()) {
+                File rootdir = new File(newPath.substring(0,newPath.lastIndexOf(File.pathSeparator)));
+                if(!rootdir.exists()){
+                    rootdir.mkdirs();
+                }
                 desfile.createNewFile();
                 Log.i("copy user.properties:", "oldpath=" + oldPath + ",newPath=" + newPath);
                 InputStream is = context.getAssets().open(oldPath);
