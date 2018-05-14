@@ -37,9 +37,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 
 import cn.lpwxs.ftpd.ftpd.services.FtpService;
@@ -87,7 +89,7 @@ public class FtpServerActivity extends AppCompatActivity {
     }
 
     static {
-        System.setProperty("java.net.preferIPv6Addresses", "false");
+//        System.setProperty("java.net.preferIPv6Addresses", "false");
     }
 
     private Context mContext;
@@ -118,14 +120,17 @@ public class FtpServerActivity extends AppCompatActivity {
         if(networkInfo != null && networkInfo.isAvailable()){
             if(networkInfo.getType() == ConnectivityManager.TYPE_WIFI){
                 //获取wifi服务
-                WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-                //判断wifi是否开启
-                if (!wifiManager.isWifiEnabled()) {
-                    wifiManager.setWifiEnabled(true);
+                WifiManager wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if(wifiManager != null) {
+                    //判断wifi是否开启
+                    if (!wifiManager.isWifiEnabled()) {
+                        wifiManager.setWifiEnabled(true);
+                    }
+                    WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                    int ipAddress = wifiInfo.getIpAddress();
+                    System.out.println(ipAddress);
+                    ip = Utils.formatIp2String(ipAddress);
                 }
-                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-                int ipAddress = wifiInfo.getIpAddress();
-                ip = formatIpAddress(ipAddress);
             }
         }
         return ip;

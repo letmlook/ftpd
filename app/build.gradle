@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "cn.lpwxs.ftpd.ftpd"
         minSdkVersion 15
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -29,14 +29,14 @@ android {
 
 dependencies {
     //    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
-    compile 'org.apache.ftpserver:ftpserver-core:1.1.1'
-    compile 'org.slf4j:slf4j-android:1.7.25'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    testImplementation 'junit:junit:4.12'
+    implementation 'org.apache.ftpserver:ftpserver-core:1.1.1'
+    implementation 'org.slf4j:slf4j-android:1.7.25'
     //    compile 'org.slf4j:slf4j-log4j12:1.7.21'
-    compile 'log4j:log4j:1.2.17'
+    implementation 'log4j:log4j:1.2.17'
 }
