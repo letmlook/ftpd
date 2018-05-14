@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ftpd</string>
+    <string name="close">close</string>
+    <string name="open">open</string>
+    <string name="service_closed">service closed</string>
+    <string name="service_never_open">service not open</string>
+    <string name="tips">Please visit the following address via ftp client:</string>
+    <string name="prefix_ftp">ftp://</string>
+    <string name="service_opening">opening service</string>
+    <string name="shortcut_title">ftpserver</string>
+</resources>
