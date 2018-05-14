@@ -103,7 +103,6 @@ public class FtpThread extends Thread {
                 Log.i("profile is exists.",newPath);
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             //如果捕捉到错误则通知UI线程
 //            MainActivity.handler.sendEmptyMessage(COPY_FALSE);
