@@ -83,7 +83,7 @@ public class FtpThread extends Thread {
         try {
             File desfile = new File(newPath);
             if (!desfile.exists()) {
-                File rootdir = new File(newPath.substring(0,newPath.lastIndexOf(File.pathSeparator)));
+                File rootdir = new File(newPath.substring(0,newPath.lastIndexOf(File.separator)));
                 if(!rootdir.exists()){
                     rootdir.mkdirs();
                 }
