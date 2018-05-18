@@ -5,6 +5,8 @@ android:
   - build-tools-27.0.3
   - android-27
   - extra
+before_install:
+    - chmod +x gradlew
 addons:
    apt:
      update: true
