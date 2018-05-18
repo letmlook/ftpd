@@ -1,8 +1,9 @@
 # ftpd
 
+[ ![Travis CI Status](https://www.travis-ci.org/letmlook/ftpd.svg?branch=master)](https://travis-ci.org/letmlook/ftpd)
+
 手机端ftp服务器，同一个局域网可分享文件给其他设备
 
-[ ![Travis CI Status](https://www.travis-ci.org/letmlook/ftpd.svg?branch=master)](https://travis-ci.org/letmlook/ftpd)
 
 ```
 功能：
