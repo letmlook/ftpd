@@ -16,3 +16,11 @@ addons:
      update: true
 script:
    - ./gradlew assembleRelease
+deploy:
+  provider: releases
+  api_key:
+    secure: ea6cdea67bdf240f6cc4874fffb319afe9a1770f
+  file: app/build/outputs/apk/release/ftpd.apk
+  skip_cleanup: true
+  on:
+    tags: true
