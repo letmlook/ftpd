@@ -25,7 +25,7 @@ public class FtpThread extends Thread {
     private FtpServer mFtpServer;
 
 
-    public FtpThread(Context context) {
+    FtpThread(Context context) {
         this.mContext = context;
     }
 
@@ -79,20 +79,21 @@ public class FtpThread extends Thread {
      * @param oldPath String  原文件路径  如：/aa
      * @param newPath String  复制后路径  如：xx:/bb/cc
      */
-    public void copyFilesFassets(Context context, String oldPath, String newPath) {
+    private void copyFilesFassets(Context context, String oldPath, String newPath) {
         try {
             File desfile = new File(newPath);
             if (!desfile.exists()) {
                 File rootdir = new File(newPath.substring(0,newPath.lastIndexOf(File.separator)));
                 if(!rootdir.exists()){
-                    rootdir.mkdirs();
+                    boolean mksucc = rootdir.mkdirs();
+                    Log.i("create dirs :",mksucc+"");
                 }
-                desfile.createNewFile();
-                Log.i("copy user.properties:", "oldpath=" + oldPath + ",newPath=" + newPath);
+                boolean mkfile = desfile.createNewFile();
+                Log.i("copy user.properties:", "oldpath=" + oldPath + ",newPath=" + newPath+", mkfile:"+mkfile);
                 InputStream is = context.getAssets().open(oldPath);
                 FileOutputStream fos = new FileOutputStream(desfile);
                 byte[] buffer = new byte[1024];
-                int byteCount = 0;
+                int byteCount;
                 while ((byteCount = is.read(buffer)) != -1) {//循环从输入流读取 buffer字节
                     fos.write(buffer, 0, byteCount);//将读取的输入流写入到输出流
                 }
