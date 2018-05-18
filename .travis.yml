@@ -19,7 +19,7 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: ea6cdea67bdf240f6cc4874fffb319afe9a1770f
+    secure: 1f016d5b24e35dd4d8e757141458f63dd8902e2b
   file: app/build/outputs/apk/release/ftpd.apk
   skip_cleanup: true
   on:
