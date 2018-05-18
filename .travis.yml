@@ -1,4 +1,5 @@
 language: android
+sudo: enabled
 android:
   commonents:
   - build-tools-27.0.3
