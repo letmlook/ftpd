@@ -1,6 +1,7 @@
 # ftpd
 
 [ ![Travis CI Status](https://www.travis-ci.org/letmlook/ftpd.svg?branch=master)](https://travis-ci.org/letmlook/ftpd)
+[![Releases](https://img.shields.io/github/downloads/letmlook/ftpd/total.svg)](https://github.com/letmlook/ftpd/releases)
 
 手机端ftp服务器，同一个局域网可分享文件给其他设备
 
